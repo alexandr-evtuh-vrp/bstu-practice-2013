@@ -1,6 +1,7 @@
 package com.example.as31_practice;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
@@ -35,8 +36,9 @@ public class MainActivity extends Activity implements OnClickListener {
 		// TODO Auto-generated method stub
 		switch (v.getId()) {
 		case R.id.btnStart:
-			// code...
-			
+			Intent intent = new Intent(this, ActivityStart.class);
+			startActivity(intent);
+			break;			
 		case R.id.btnSettings:
 			// code...
 		default:
