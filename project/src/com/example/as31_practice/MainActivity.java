@@ -39,29 +39,11 @@ public class MainActivity extends Activity implements OnClickListener {
 		cv = new ContentValues();
 		db = dbHelper.getWritableDatabase();
 		
-		// Inserting test data into DB // TEST!!!
-		// example		
-//		Log.d(LOG_SQL, "--- Inserting rows into table traffic_light: ---");
-//		for (int i = 1; i < 7; i++){
-//			cv.put("id", i);
-//			cv.put("timeOn", "07:00:00");
-//			cv.put("timeOff", "22:00:00");
-//			cv.put("x", 53.17462);
-//			cv.put("y", 34.94832);
-//			cv.put("green", 35);
-//			cv.put("yellow", 3);
-//			cv.put("red", 25);
-//			cv.put("nextTo", "2, 3, 4");
-//			long rowID = db.insert("traffic_light", null, cv);
-//			Log.d(LOG_SQL, "Insert row id = " + rowID);
-//		}
-		
 		// Show rows
 		Log.d(LOG_SQL, "--- Rows in traffic_light: ---");		
 		Cursor c = db.query("traffic_light", null, null, null, null, null, null);
 		
 		if (c.moveToFirst()) {
-			
 			
 			int idColIndex = c.getColumnIndex("id");
 			int timeOnColIndex = c.getColumnIndex("timeOn");
@@ -72,7 +54,6 @@ public class MainActivity extends Activity implements OnClickListener {
 			int yellowColIndex = c.getColumnIndex("yellow");
 			int redColIndex = c.getColumnIndex("red");
 			int nextToColIndex = c.getColumnIndex("nextTo");
-			
 			
 			do {
 				Log.d(LOG_SQL, 
@@ -134,6 +115,50 @@ public class MainActivity extends Activity implements OnClickListener {
 				+ "yellow integer,"
 				+ "red integer," 
 				+ "nextTo text" + ");");
+			
+			// Inserting test data into DB
+			Log.d(LOG_SQL, "--- Inserting rows into table traffic_light: ---");
+			int n = 0;
+			for (int i = 0; i < 13; i += 6) {
+				for (int j = 0; j < 13; j += 6) {
+					cv.put("id", ++n);
+					cv.put("timeOn", "07:00:00");
+					cv.put("timeOff", "22:00:00");
+					cv.put("x", (double) j);
+					cv.put("y", (double) i);
+					cv.put("green", 35);
+					cv.put("yellow", 3);
+					cv.put("red", 25);
+					cv.put("nextTo", getNextTo(n));
+					long rowID = db.insert("traffic_light", null, cv);
+					Log.d(LOG_SQL, "Insert row id = " + rowID);
+				}
+			}
+		}
+		
+		public String getNextTo(int temp) {
+			switch (temp) {
+			case 1:
+				return "2, 4";
+			case 2:
+				return "1, 3, 5";
+			case 3:
+				return "2, 6";
+			case 4:
+				return "1, 5, 7";
+			case 5:
+				return "2, 4, 6, 8";
+			case 6:
+				return "3, 5, 9";
+			case 7:
+				return "4, 8";
+			case 8:
+				return "5, 7, 9";
+			case 9:
+				return "6, 8";
+			default:
+				return "0";
+			}
 		}
 		
 		// 
