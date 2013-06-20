@@ -39,10 +39,9 @@ public class MainActivity extends Activity implements OnClickListener {
 		cv = new ContentValues();
 		db = dbHelper.getWritableDatabase();
 		
-		// Добавление тестовых(почти одинаковых) данных в БД // TEST!!!
-		// пример работы с бд
-		// добавление производим 1 раз!!!		
-//		Log.d(LOG_SQL, "--- Добавление строк в таблицу traffic_light: ---");
+		// Inserting test data into DB // TEST!!!
+		// example		
+//		Log.d(LOG_SQL, "--- Inserting rows into table traffic_light: ---");
 //		for (int i = 1; i < 7; i++){
 //			cv.put("id", i);
 //			cv.put("timeOn", "07:00:00");
@@ -54,16 +53,16 @@ public class MainActivity extends Activity implements OnClickListener {
 //			cv.put("red", 25);
 //			cv.put("nextTo", "2, 3, 4");
 //			long rowID = db.insert("traffic_light", null, cv);
-//			Log.d(LOG_SQL, "Добавлена строка id = " + rowID);
+//			Log.d(LOG_SQL, "Insert row id = " + rowID);
 //		}
 		
-		// Проверка наличия данных в БД
-		Log.d(LOG_SQL, "--- Чтение строк из таблицы traffic_light: ---");		
+		// Show rows
+		Log.d(LOG_SQL, "--- Rows in traffic_light: ---");		
 		Cursor c = db.query("traffic_light", null, null, null, null, null, null);
 		
 		if (c.moveToFirst()) {
 			
-			// Определяем номера столбцов по имени в выборке
+			
 			int idColIndex = c.getColumnIndex("id");
 			int timeOnColIndex = c.getColumnIndex("timeOn");
 			int timeOffColIndex = c.getColumnIndex("timeOff");
@@ -74,7 +73,7 @@ public class MainActivity extends Activity implements OnClickListener {
 			int redColIndex = c.getColumnIndex("red");
 			int nextToColIndex = c.getColumnIndex("nextTo");
 			
-			// Получаем значения
+			
 			do {
 				Log.d(LOG_SQL, 
 					"id = " + c.getInt(idColIndex) +
@@ -88,7 +87,7 @@ public class MainActivity extends Activity implements OnClickListener {
 					", nextTo = " + c.getString(nextToColIndex));				
 			} while (c.moveToNext());
 		} else {
-			Log.d(LOG_SQL, "Прочитано 0 строк из таблицы traffic_light: ---");
+			Log.d(LOG_SQL, "0 rows in table traffic_light: ---");
 			c.close();
 		}
 	}
@@ -122,11 +121,9 @@ public class MainActivity extends Activity implements OnClickListener {
 			super(context, "traffic_light", null, 1);
 		}
 		
-		// Подключение к БД, которой не существует
 		public void onCreate(SQLiteDatabase db) {
-			Log.d(LOG_SQL, "Создание БД");
-			// Создание таблицы с полями
-			// Тип данных дата время в SQLite - строка формата ISO8601 ("YYYY-MM-DD HH:MM:SS.SSS")
+			Log.d(LOG_SQL, "Creating DB");
+			// time data ("YYYY-MM-DD HH:MM:SS.SSS")
 			db.execSQL("create table traffic_light ("
 				+ "id integer primary key, "
 				+ "timeOn text,"
@@ -139,14 +136,12 @@ public class MainActivity extends Activity implements OnClickListener {
 				+ "nextTo text" + ");");
 		}
 		
-		// Подключение к БД более новой версии, чем существующая
+		// 
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-			Log.d(LOG_SQL, " --- Обновление БД --- ");
-			Log.d(LOG_SQL, " c " + oldVersion
-			          + " по " + newVersion + " версию ");
+			Log.d(LOG_SQL, " --- Updating DB --- ");
+			Log.d(LOG_SQL, " from " + oldVersion
+			          + " to " + newVersion + " version ");
 			// code...
-			// транзакция модификации бд...
-			// будет реализовано при необходимости при наличии реальных данных
 		}
 	}
 
