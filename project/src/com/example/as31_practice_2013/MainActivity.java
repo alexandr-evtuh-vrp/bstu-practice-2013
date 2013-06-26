@@ -1,10 +1,9 @@
-package com.example.as31_practice;
+package com.example.as31_practice_2013;
 
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
@@ -21,7 +20,6 @@ public class MainActivity extends Activity implements OnClickListener {
 	
 	ContentValues cv;
 	SQLiteDatabase db;
-	
 	DBHelper dbHelper;
 
 	@Override
@@ -35,42 +33,13 @@ public class MainActivity extends Activity implements OnClickListener {
 		btnStart.setOnClickListener(this);
 		btnSettings.setOnClickListener(this);
 		
+		
 		dbHelper = new DBHelper(this);	
 		cv = new ContentValues();
 		db = dbHelper.getWritableDatabase();
+				
+//		Cursor c = db.query("traffic_light", null, null, null, null, null, null);
 		
-		// Show rows
-		Log.d(LOG_SQL, "--- Rows in traffic_light: ---");		
-		Cursor c = db.query("traffic_light", null, null, null, null, null, null);
-		
-		if (c.moveToFirst()) {
-			
-			int idColIndex = c.getColumnIndex("id");
-			int timeOnColIndex = c.getColumnIndex("timeOn");
-			int timeOffColIndex = c.getColumnIndex("timeOff");
-			int xColIndex = c.getColumnIndex("x");
-			int yColIndex = c.getColumnIndex("y");
-			int greenColIndex = c.getColumnIndex("green");
-			int yellowColIndex = c.getColumnIndex("yellow");
-			int redColIndex = c.getColumnIndex("red");
-			int nextToColIndex = c.getColumnIndex("nextTo");
-			
-			do {
-				Log.d(LOG_SQL, 
-					"id = " + c.getInt(idColIndex) +
-					", timeOn = " + c.getString(timeOnColIndex) +
-					", timeOff = " + c.getString(timeOffColIndex) +
-					", x = " + c.getDouble(xColIndex) +
-					", y = " + c.getDouble(yColIndex) +
-					", green = " + c.getInt(greenColIndex) +
-					", yellow = " + c.getInt(yellowColIndex) +
-					", red = " + c.getInt(redColIndex) +
-					", nextTo = " + c.getString(nextToColIndex));				
-			} while (c.moveToNext());
-		} else {
-			Log.d(LOG_SQL, "0 rows in table traffic_light: ---");
-			c.close();
-		}
 	}
 
 	@Override
@@ -86,6 +55,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		switch (v.getId()) {
 		case R.id.btnStart:
 			Intent intent = new Intent(this, ActivityStart.class);
+			
 			startActivity(intent);
 			break;			
 		case R.id.btnSettings:
@@ -97,7 +67,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		
 	}
 	
-	class DBHelper extends SQLiteOpenHelper {
+	public class DBHelper extends SQLiteOpenHelper {
 		public DBHelper(Context context) {
 			super(context, "traffic_light", null, 1);
 		}
@@ -116,52 +86,19 @@ public class MainActivity extends Activity implements OnClickListener {
 				+ "red integer," 
 				+ "nextTo text" + ");");
 			
-			// Inserting test data into DB
-			Log.d(LOG_SQL, "--- Inserting rows into table traffic_light: ---");
-			int n = 0;
-			for (int i = 0; i < 13; i += 6) {
-				for (int j = 0; j < 13; j += 6) {
-					cv.put("id", ++n);
-					cv.put("timeOn", "07:00:00");
-					cv.put("timeOff", "22:00:00");
-					cv.put("x", (double) j);
-					cv.put("y", (double) i);
-					cv.put("green", 35);
-					cv.put("yellow", 3);
-					cv.put("red", 25);
-					cv.put("nextTo", getNextTo(n));
-					long rowID = db.insert("traffic_light", null, cv);
-					Log.d(LOG_SQL, "Insert row id = " + rowID);
-				}
-			}
+		// inserting test traffic light (real - Moskovskaia and Respubliki)
+				cv.put("id", 1);
+				cv.put("timeOn", "07:00:00");
+				cv.put("timeOff", "23:00:00");
+				cv.put("x", 52.099594);
+				cv.put("y", 23.764149);
+				cv.put("green", 35);
+				cv.put("yellow", 3);
+				cv.put("red", 25);
+				cv.put("nextTo", "2, 3, 4");
+				long rowID = db.insert("traffic_light", null, cv);
 		}
 		
-		public String getNextTo(int temp) {
-			switch (temp) {
-			case 1:
-				return "2, 4";
-			case 2:
-				return "1, 3, 5";
-			case 3:
-				return "2, 6";
-			case 4:
-				return "1, 5, 7";
-			case 5:
-				return "2, 4, 6, 8";
-			case 6:
-				return "3, 5, 9";
-			case 7:
-				return "4, 8";
-			case 8:
-				return "5, 7, 9";
-			case 9:
-				return "6, 8";
-			default:
-				return "0";
-			}
-		}
-		
-		// 
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 			Log.d(LOG_SQL, " --- Updating DB --- ");
 			Log.d(LOG_SQL, " from " + oldVersion
