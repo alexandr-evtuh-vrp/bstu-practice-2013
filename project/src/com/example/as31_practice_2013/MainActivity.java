@@ -37,9 +37,10 @@ public class MainActivity extends Activity implements OnClickListener {
 		dbHelper = new DBHelper(this);	
 		cv = new ContentValues();
 		db = dbHelper.getWritableDatabase();
-				
+		
 //		Cursor c = db.query("traffic_light", null, null, null, null, null, null);
 		
+		db.close();
 	}
 
 	@Override

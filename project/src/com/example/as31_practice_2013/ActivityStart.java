@@ -1,5 +1,9 @@
 package com.example.as31_practice_2013;
 
+
+
+import java.util.Date;
+
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
@@ -21,12 +25,12 @@ public class ActivityStart extends Activity implements LocationListener {
 	ContentValues cv;
 	SQLiteDatabase db;
 	DBHelper dbHelper;
+	Cursor c;
 	
 	
 	final String TAG = "lstart";
 	
 	TextView tvStreets, tvSpeed1, tvSpeed2, tvSpeed3;
-	
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +52,10 @@ public class ActivityStart extends Activity implements LocationListener {
 		dbHelper = new DBHelper(this);
 		cv = new ContentValues();
 		db = dbHelper.getReadableDatabase();
+		
+		c = db.query("traffic_light", null, null, null, null, null, null);
+		
+		greenTime();
 	}
 
 	@Override
@@ -75,7 +83,6 @@ public class ActivityStart extends Activity implements LocationListener {
 	}
 	
 	public void speed(double xLat, double yLong) {
-		Cursor c = db.query("traffic_light", null, null, null, null, null, null);
 		c.moveToFirst();
 		int xColIndex = c.getColumnIndex("x");
 		int yColIndex = c.getColumnIndex("y");
@@ -102,9 +109,50 @@ public class ActivityStart extends Activity implements LocationListener {
 		double ad = Math.atan2(y, x);
 		double dist = ad * 6372795;
 		
+		double v = dist / greenTime() * 3.6; 
+		
 		tvSpeed1.setText("From:\n" + "Latitude " + xLat + "\nLongtitude " + yLong);
 		tvSpeed2.setText("\nTo:\n" + "Latitude " + lat + "\nLongtitude " + lon);
-		tvSpeed3.setText("\nDistance " + dist + "\n");
+		tvSpeed3.setText("\nSpeed " + v + "\n");
+	}
+	
+	@SuppressWarnings("deprecation")
+	public int greenTime() {
+		c.moveToFirst();
+		int greenColIndex = c.getColumnIndex("green");
+		int yellowColIndex = c.getColumnIndex("yellow");
+		int redColIndex = c.getColumnIndex("red");
+		
+		int green = c.getInt(greenColIndex);
+		int yellow = c.getInt(yellowColIndex);
+		int red = c.getInt(redColIndex);
+		
+		int round = green + yellow + red;
+		int point = green / 2;
+		int start = point;
+		
+		Date date = new Date();
+		Date constDate = new Date();
+		Date finishDate = new Date();
+		constDate.setHours(7);
+		constDate.setMinutes(0);
+		constDate.setSeconds(0);
+		finishDate.setHours(23);
+		finishDate.setMinutes(0);
+		finishDate.setSeconds(0);
+		int hours = date.getHours();
+		int min = date.getMinutes();
+		int sec = date.getSeconds();
+		
+		while ((start < ((date.getTime() - constDate.getTime()) / 1000)) 
+				&& date.before(finishDate)) {
+			start += round;
+		}
+		
+		
+//		tvSpeed1.setText("Time " + ((date.getTime() - constDate.getTime()) / 1000) + 
+//			"\nGreen in " + start);
+		return (int) (start - ((date.getTime() - constDate.getTime()) / 1000));
 	}
 	public class DBHelper extends SQLiteOpenHelper {
 		public DBHelper(Context context) {
