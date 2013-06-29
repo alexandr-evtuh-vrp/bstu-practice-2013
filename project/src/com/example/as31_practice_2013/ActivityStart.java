@@ -109,6 +109,8 @@ public class ActivityStart extends Activity implements LocationListener {
 		double ad = Math.atan2(y, x);
 		double dist = ad * 6372795;
 		
+		Log.d("user", "greenTime() = " + greenTime());
+		
 		double v = dist / greenTime() * 3.6; 
 		
 		tvSpeed1.setText("From:\n" + "Latitude " + xLat + "\nLongtitude " + yLong);
@@ -119,10 +121,14 @@ public class ActivityStart extends Activity implements LocationListener {
 	@SuppressWarnings("deprecation")
 	public int greenTime() {
 		c.moveToFirst();
+		int timeOnColIndex = c.getColumnIndex("timeOn");
+		int timeOffColIndex = c.getColumnIndex("timeOff");
 		int greenColIndex = c.getColumnIndex("green");
 		int yellowColIndex = c.getColumnIndex("yellow");
 		int redColIndex = c.getColumnIndex("red");
 		
+		String[] timeOn = c.getString(timeOnColIndex).split(":");
+		String[] timeOff = c.getString(timeOffColIndex).split(":");
 		int green = c.getInt(greenColIndex);
 		int yellow = c.getInt(yellowColIndex);
 		int red = c.getInt(redColIndex);
@@ -134,25 +140,31 @@ public class ActivityStart extends Activity implements LocationListener {
 		Date date = new Date();
 		Date constDate = new Date();
 		Date finishDate = new Date();
-		constDate.setHours(7);
-		constDate.setMinutes(0);
-		constDate.setSeconds(0);
-		finishDate.setHours(23);
-		finishDate.setMinutes(0);
-		finishDate.setSeconds(0);
+		constDate.setHours(Integer.parseInt(timeOn[0]));		
+		constDate.setMinutes(Integer.parseInt(timeOn[1]));
+		constDate.setSeconds(Integer.parseInt(timeOn[2]));
+		finishDate.setHours(Integer.parseInt(timeOff[0]));
+		finishDate.setMinutes(Integer.parseInt(timeOff[1]));
+		finishDate.setSeconds(Integer.parseInt(timeOff[2]));
 		int hours = date.getHours();
 		int min = date.getMinutes();
 		int sec = date.getSeconds();
 		
-		while ((start < ((date.getTime() - constDate.getTime()) / 1000)) 
+		/*while ((start < ((date.getTime() - constDate.getTime()) / 1000)) 
 				&& date.before(finishDate)) {
 			start += round;
-		}
+		}*/
 		
+		/// Alternative method to count time
 		
-//		tvSpeed1.setText("Time " + ((date.getTime() - constDate.getTime()) / 1000) + 
-//			"\nGreen in " + start);
-		return (int) (start - ((date.getTime() - constDate.getTime()) / 1000));
+		// time from start traffic light to current time
+		long dTime = (date.getTime() - constDate.getTime()) / 1000;
+		// time to red color
+		int timeLeft = (int) (round - (dTime % round));
+		// return time from current to half of green light
+		return ((timeLeft > point) ? (timeLeft - point) : (round + timeLeft - point));
+		
+		//return (int) (start - ((date.getTime() - constDate.getTime()) / 1000));
 	}
 	public class DBHelper extends SQLiteOpenHelper {
 		public DBHelper(Context context) {
