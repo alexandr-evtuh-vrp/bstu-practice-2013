@@ -9,7 +9,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -26,8 +25,7 @@ public class ActivityStart extends Activity implements LocationListener {
 	SQLiteDatabase db;
 	DBHelper dbHelper;
 	Cursor c;
-	
-	
+
 	final String TAG = "lstart";
 	
 	TextView tvStreets, tvSpeed1, tvSpeed2, tvSpeed3;
@@ -42,14 +40,13 @@ public class ActivityStart extends Activity implements LocationListener {
 		myManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
 		myManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
 		best = myManager.getBestProvider(crit, false);
-		Location loc = myManager.getLastKnownLocation(best);
 		
 		tvStreets = (TextView) findViewById(R.id.tvStreets);
 		tvSpeed1 = (TextView) findViewById(R.id.tvSpeed1);
 		tvSpeed2 = (TextView) findViewById(R.id.tvSpeed2);
 		tvSpeed3 = (TextView) findViewById(R.id.tvSpeed3);
 		
-		dbHelper = new DBHelper(this);
+		dbHelper = new DBHelper(this, "");
 		cv = new ContentValues();
 		db = dbHelper.getReadableDatabase();
 		
@@ -89,6 +86,10 @@ public class ActivityStart extends Activity implements LocationListener {
 		double lat = c.getDouble(xColIndex);
 		double lon = c.getDouble(yColIndex);
 		
+		//
+		tvSpeed1.setText("From:\n" + "Latitude " + xLat + "\nLongtitude " + yLong);
+		tvSpeed2.setText("\nTo:\n" + "Latitude " + lat + "\nLongtitude " + lon);
+		
 		// 
 		xLat *= Math.PI / 180;
 		lat *= Math.PI / 180;
@@ -113,9 +114,8 @@ public class ActivityStart extends Activity implements LocationListener {
 		
 		double v = dist / greenTime() * 3.6; 
 		
-		tvSpeed1.setText("From:\n" + "Latitude " + xLat + "\nLongtitude " + yLong);
-		tvSpeed2.setText("\nTo:\n" + "Latitude " + lat + "\nLongtitude " + lon);
-		tvSpeed3.setText("\nSpeed " + v + "\n");
+		tvSpeed3.setText("\nSpeed " + v + "\nDistance " + dist + "\nTime for green " 
+				+ greenTime());
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -135,7 +135,6 @@ public class ActivityStart extends Activity implements LocationListener {
 		
 		int round = green + yellow + red;
 		int point = green / 2;
-		int start = point;
 		
 		Date date = new Date();
 		Date constDate = new Date();
@@ -146,42 +145,13 @@ public class ActivityStart extends Activity implements LocationListener {
 		finishDate.setHours(Integer.parseInt(timeOff[0]));
 		finishDate.setMinutes(Integer.parseInt(timeOff[1]));
 		finishDate.setSeconds(Integer.parseInt(timeOff[2]));
-		int hours = date.getHours();
-		int min = date.getMinutes();
-		int sec = date.getSeconds();
-		
-		/*while ((start < ((date.getTime() - constDate.getTime()) / 1000)) 
-				&& date.before(finishDate)) {
-			start += round;
-		}*/
-		
-		/// Alternative method to count time
-		
+
 		// time from start traffic light to current time
 		long dTime = (date.getTime() - constDate.getTime()) / 1000;
 		// time to red color
 		int timeLeft = (int) (round - (dTime % round));
 		// return time from current to half of green light
 		return ((timeLeft > point) ? (timeLeft - point) : (round + timeLeft - point));
-		
-		//return (int) (start - ((date.getTime() - constDate.getTime()) / 1000));
-	}
-	public class DBHelper extends SQLiteOpenHelper {
-		public DBHelper(Context context) {
-			super(context, "traffic_light", null, 1);
-		}
-		
-		public void onCreate(SQLiteDatabase db) {
-			Log.d(TAG, "Creating DB");
-			// 
-		}
-
-		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-			Log.d(TAG, " --- Updating DB --- ");
-			Log.d(TAG, " from " + oldVersion
-				+ " to " + newVersion + " version ");
-			// code...
-		}
 	}
 }
 
