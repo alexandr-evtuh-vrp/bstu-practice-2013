@@ -44,6 +44,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		dbHelper = new DBHelper(this, querry);	
 		cv = new ContentValues();
 		db = dbHelper.getWritableDatabase();
+		
 		db.close();
 	}
 
@@ -56,7 +57,6 @@ public class MainActivity extends Activity implements OnClickListener {
 
 	@Override
 	public void onClick(View v) {
-		// TODO Auto-generated method stub
 		switch (v.getId()) {
 		case R.id.btnStart:
 			Intent intent = new Intent(this, ActivityStart.class);

@@ -1,7 +1,5 @@
 package com.example.as31_practice_2013;
 
-
-
 import java.util.Date;
 
 import android.app.Activity;
@@ -57,20 +55,21 @@ public class ActivityStart extends Activity implements LocationListener {
 
 	@Override
 	public void onLocationChanged(Location location) {
-		// TODO Auto-generated method stub
-		this.speed(location.getLatitude(), location.getLongitude());
+		Log.d("lstart", "changed");
+		this.getSpeed(location.getLatitude(), location.getLongitude());
+		Log.d("lstart", "" + location.getSpeed());
+		
 	}
 
 	@Override
 	public void onProviderDisabled(String provider) {
-		// TODO Auto-generated method stub
 		tvStreets.setText("Disabled");
 	}
 
 	@Override
 	public void onProviderEnabled(String provider) {
-		// TODO Auto-generated method stub
 		tvStreets.setText("Enabled");
+		Log.d("lstart", "enabled");
 	}
 
 	@Override
@@ -79,43 +78,28 @@ public class ActivityStart extends Activity implements LocationListener {
 		
 	}
 	
-	public void speed(double xLat, double yLong) {
+	public void getSpeed(double startLatitude, double startLongitude) {
 		c.moveToFirst();
 		int xColIndex = c.getColumnIndex("x");
 		int yColIndex = c.getColumnIndex("y");
-		double lat = c.getDouble(xColIndex);
-		double lon = c.getDouble(yColIndex);
+		double endLatitude = c.getDouble(xColIndex);
+		double endLongitude = c.getDouble(yColIndex);
 		
 		//
-		tvSpeed1.setText("From:\n" + "Latitude " + xLat + "\nLongtitude " + yLong);
-		tvSpeed2.setText("\nTo:\n" + "Latitude " + lat + "\nLongtitude " + lon);
-		
-		// 
-		xLat *= Math.PI / 180;
-		lat *= Math.PI / 180;
-		yLong *= Math.PI / 180;
-		lon *= Math.PI / 180;
-		// 
-		double cl1 = Math.cos(xLat);
-		double cl2 = Math.cos(lat);
-		double sl1 = Math.sin(xLat);
-		double sl2 = Math.sin(lat);
-		double delta = lon - yLong;
-		double cDelta = Math.cos(delta);
-		double sDelta = Math.sin(delta);
-		
-		//
-		double y = Math.sqrt(Math.pow(cl2 * sDelta, 2) + Math.pow(cl1 * sl2 - sl1 * cl2 * cDelta, 2));
-		double x = sl1 * sl2 + cl1 * cl2 * cDelta;
-		double ad = Math.atan2(y, x);
-		double dist = ad * 6372795;
-		
+		tvSpeed1.setText("From:\n" + "Latitude " + startLatitude + "\nLongtitude " + startLongitude);
+		tvSpeed2.setText("\nTo:\n" + "Latitude " + endLatitude + "\nLongtitude " + endLongitude);
+	
 		Log.d("user", "greenTime() = " + greenTime());
 		
-		double v = dist / greenTime() * 3.6; 
+		// Approximate distance in meters between two locations
+		float[] distance = {0};
+		Location.distanceBetween(startLatitude, startLongitude, endLatitude, endLongitude, distance);
 		
-		tvSpeed3.setText("\nSpeed " + v + "\nDistance " + dist + "\nTime for green " 
+		double speed = distance[0] / greenTime() * 3.6;
+		
+		tvSpeed3.setText("\nSpeed " + speed + "\nDistanceFunc " + distance[0] + "\nTime for green " 
 				+ greenTime());
+		
 	}
 	
 	@SuppressWarnings("deprecation")

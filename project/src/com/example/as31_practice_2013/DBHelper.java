@@ -34,7 +34,31 @@ public class DBHelper extends SQLiteOpenHelper {
 		cv.put("green", 35);
 		cv.put("yellow", 3);
 		cv.put("red", 25);
-		cv.put("nextTo", "2, 3, 4");
+		cv.put("nextTo", "2, 3");
+		db.insert("traffic_light", null, cv);
+		
+		// Moskovskaia almi
+		cv.put("id", 2);
+		cv.put("timeOn", "07:00:00");
+		cv.put("timeOff", "23:00:00");
+		cv.put("x", 52.098893);
+		cv.put("y", 23.759477);
+		cv.put("green", 35);
+		cv.put("yellow", 3);
+		cv.put("red", 25);
+		cv.put("nextTo", "1");
+		db.insert("traffic_light", null, cv);
+		
+		// Respubliki and Krushinskoi
+		cv.put("id", 3);
+		cv.put("timeOn", "07:00:00");
+		cv.put("timeOff", "23:00:00");
+		cv.put("x", 52.095979);
+		cv.put("y", 23.765987);
+		cv.put("green", 35);
+		cv.put("yellow", 3);
+		cv.put("red", 25);
+		cv.put("nextTo", "1");
 		db.insert("traffic_light", null, cv);
 		Log.d("dbHelper", "After insert");
 	}
